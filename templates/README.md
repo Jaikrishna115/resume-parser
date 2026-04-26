@@ -1,29 +1,54 @@
-# ✧ AI Resume Parser | Executive Edition
-
+✧ AI Resume Parser | Executive Edition
 An enterprise-grade, NLP-powered web application designed to automatically extract contact telemetry and technical proficiencies from unstructured PDF resumes.
 
-## ✨ Intelligence Engine Features
-* **Automated Data Extraction:** Seamlessly parses PDF documents utilizing `PyMuPDF` to strip raw text while handling complex visual layouts.
-* **Named Entity Recognition (NER):** Powered by `spaCy`, the industry-standard NLP engine, to identify and categorize technical skills against a dynamic proficiency database.
-* **Regex Architecture:** Utilizes advanced regular expressions to accurately isolate phone numbers and email addresses.
-* **Premium UI/UX:** Features a glassmorphism dark-mode interface with asynchronous processing, golden accents, and micro-interaction animations.
+✨ Intelligence Engine Features
+Automated Data Extraction: Seamlessly parses PDF documents utilizing PyMuPDF for rapid, secure raw text extraction.
 
-## 🛠️ Tech Stack
-* **Backend:** Python, Flask, Werkzeug
-* **NLP & Processing:** spaCy, PyMuPDF (`fitz`), Regular Expressions (Regex)
-* **Frontend:** HTML5, CSS3, Vanilla JavaScript (Fetch API)
+Exhaustive Proficiency Matching: Powered by spaCy tokenization, the engine evaluates candidate text against a massive "Mega-Dictionary" of modern tech stacks to guarantee high-precision skill extraction without AI hallucination.
 
-## 🚀 Deployment Instructions
+Regex Architecture: Utilizes advanced regular expressions to accurately isolate phone numbers and email addresses, accounting for regional formatting variances.
+
+Premium UI/UX: Features a glassmorphism dark-mode interface with asynchronous processing, golden accents, drag-and-drop capabilities, and micro-interaction animations.
+
+🛠️ Tech Stack
+
+Backend: Python, Flask, Werkzeug
+
+NLP & Processing: spaCy (en_core_web_sm), PyMuPDF (fitz), Regular Expressions (Regex)
+
+Frontend: HTML5, CSS3, Vanilla JavaScript (Fetch API)
+
+📁 Project Structure
+
+resume-parser/
+├── app.py              # Flask server and API routing
+├── extractor.py        # PyMuPDF text extraction logic
+├── parser.py           # spaCy NLP processing and Regex engine
+├── requirements.txt    # Python dependencies
+└── templates/
+    └── index.html      # Premium glassmorphism frontend
+
+🚀 Deployment Instructions
 1. Clone the repository:
-   ```bash
-   git clone [https://github.com/Jaikrishna115/resume-parser.git](https://github.com/Jaikrishna115/resume-parser.git)
 
+git clone https://github.com/Jaikrishna115/resume-parser.git
+cd resume-parser
 
-Install the necessary dependencies:
+2. Install the necessary dependencies:
 
 pip install -r requirements.txt
+
+3. Download the NLP core model:
+
 python -m spacy download en_core_web_sm
 
+4. Boot the Intelligence Engine:
 
-Boot the Flask server:
 python app.py
+The application will be available locally at http://127.0.0.1:5000
+
+💡 Usage
+->Open the web interface in your browser.
+->Drag and drop a candidate's PDF resume into the upload zone.
+->Click Execute Extraction.
+->The engine will process the document asynchronously and display the parsed telemetry (Email, Phone, Skills) in a clean, animated results grid.

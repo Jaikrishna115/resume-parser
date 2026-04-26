@@ -33,11 +33,42 @@ def parse_resume(text):
 
     # 4. Extract Skills using NLP token matching
     # A standard parser checks against a massive database of thousands of skills.
-    # We will use a targeted list for your specific profile.
-    tech_stack = [
-        "python", "pandas", "numpy", "matplotlib", "scikit-learn", 
-        "flask", "html", "css", "mysql", "git", "github", "langchain", "faiss"
-    ]
+    # We use a set {} here because it makes the keyword lookup lightning fast
+    tech_stack = {
+        # Programming Languages
+        "python", "java", "javascript", "typescript", "c", "cpp", "c++", "c#", "ruby", 
+        "php", "swift", "kotlin", "go", "golang", "rust", "r", "matlab", "bash", "shell", 
+        "dart", "scala", "perl", "haskell",
+        
+        # Data Science, AI & Machine Learning
+        "pandas", "numpy", "matplotlib", "seaborn", "scikit-learn", "tensorflow", 
+        "keras", "pytorch", "opencv", "nltk", "spacy", "transformers", "langchain", 
+        "faiss", "xgboost", "lightgbm", "llm", "llama", "nlp", "yolo", "scipy", 
+        "jupyter", "colab", "databricks", "huggingface",
+        
+        # Web & App Development
+        "html", "css", "react", "angular", "vue", "node", "nodejs", "express", 
+        "django", "flask", "fastapi", "spring", "springboot", "bootstrap", 
+        "tailwind", "jquery", "sass", "less", "nextjs", "reactnative", "flutter",
+        
+        # Databases & Storage
+        "sql", "mysql", "postgresql", "postgres", "mongodb", "sqlite", "redis", 
+        "cassandra", "oracle", "dynamodb", "neo4j", "firebase", "supabase", 
+        "elasticsearch", "mariadb", "couchdb",
+        
+        # Cloud, Infrastructure & DevOps
+        "aws", "azure", "gcp", "docker", "kubernetes", "k8s", "jenkins", "git", 
+        "github", "gitlab", "bitbucket", "terraform", "ansible", "linux", "ubuntu", 
+        "centos", "unix", "nginx", "apache", "docker-compose",
+        
+        # Big Data & Analytics
+        "hadoop", "spark", "pyspark", "kafka", "tableau", "powerbi", "excel", 
+        "snowflake", "airflow", "bigquery",
+        
+        # Tools & Methodologies
+        "agile", "scrum", "jira", "confluence", "figma", "postman", "swagger", 
+        "rest", "graphql", "json", "xml", "pytest", "selenium"
+    }
     
     found_skills = set() # We use a 'set' to avoid duplicate skills
     
