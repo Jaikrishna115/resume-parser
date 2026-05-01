@@ -20,7 +20,7 @@
             /* Text */
             --text-main: #F8FAFC;
             --text-muted: #9CA3AF;
-            --border: rgba(248, 181, 0, 0.2); /* Subtle gold border */
+            --border: rgba(248, 181, 0, 0.2);
         }
 
         body {
@@ -134,7 +134,7 @@
 
         button {
             background: linear-gradient(135deg, var(--gold-light), var(--gold-main));
-            color: #000000; /* Black text for high contrast against gold */
+            color: #000000;
             border: none;
             padding: 16px 32px;
             border-radius: 12px;
@@ -156,7 +156,6 @@
             background: linear-gradient(135deg, #FFF, var(--gold-main));
         }
 
-        button:active { transform: translateY(0); }
         button:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; transform: none; }
 
         /* Results Section */
@@ -164,30 +163,26 @@
             display: none;
             opacity: 0;
             transform: translateY(20px);
-            animation: slideUp 0.5s ease forwards;
             text-align: left;
             padding: 32px;
-        }
-
-        @keyframes slideUp {
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .results-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
-        .info-box {
+        .info-box, .full-width-box {
             background: rgba(10, 10, 10, 0.6);
-            padding: 16px;
+            padding: 20px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 16px;
         }
 
-        .info-box h3 {
+        .info-box h3, .full-width-box h3 {
             margin: 0 0 8px 0;
             font-size: 12px;
             color: var(--gold-main);
@@ -196,26 +191,36 @@
         }
 
         .info-box p {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 600;
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-main);
+        overflow-wrap: break-word; 
+        word-break: normal;
+        }
+
+        .summary-text {
+            font-size: 15px;
+            line-height: 1.6;
             color: var(--text-main);
-            word-break: break-all;
+            margin: 0;
+            font-style: italic;
         }
 
-        .skills-section {
-            background: rgba(10, 10, 10, 0.6);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .link-item {
+            display: inline-block;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 8px;
+            margin-right: 12px;
+            padding-bottom: 2px;
+            border-bottom: 1px dashed var(--gold-main);
+            transition: color 0.2s ease;
         }
 
-        .skills-section h3 {
-            margin: 0 0 16px 0;
-            font-size: 12px;
-            color: var(--gold-main);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .link-item:hover {
+            color: var(--gold-light);
         }
 
         .skills-container {
@@ -238,9 +243,8 @@
             transform: scale(0.8);
         }
 
-        @keyframes popIn {
-            to { opacity: 1; transform: scale(1); }
-        }
+        @keyframes popIn { to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
         .loader {
             border: 3px solid rgba(0,0,0,0.1);
@@ -264,10 +268,11 @@
 <body>
 
     <div class="main-container">
+        <!-- UPLOAD CARD -->
         <div class="card">
             <div class="header-icon">✧</div>
             <h2>AI Intelligence Engine</h2>
-            <p class="subtitle">Securely upload a curriculum vitae to extract key contact telemetry and technical proficiencies.</p>
+            <p class="subtitle">Securely upload a curriculum vitae to extract key contact telemetry, technical proficiencies, and AI summaries.</p>
 
             <label class="upload-area" id="dropZone">
                 <input type="file" id="fileInput" accept=".pdf" onchange="updateFileName()">
@@ -284,7 +289,16 @@
             </button>
         </div>
 
+        <!-- RESULTS CARD -->
         <div class="card" id="resultsCard">
+            
+            <!-- AI Summary Section (NEW) -->
+            <div class="full-width-box">
+                <h3>Executive Summary</h3>
+                <p id="resSummary" class="summary-text">-</p>
+            </div>
+
+            <!-- Contact Grid -->
             <div class="results-grid">
                 <div class="info-box">
                     <h3>Contact Email</h3>
@@ -296,7 +310,14 @@
                 </div>
             </div>
             
-            <div class="skills-section">
+            <!-- Social Links Section (NEW) -->
+            <div class="full-width-box" id="linksContainerBox" style="display: none;">
+                <h3>Digital Footprint</h3>
+                <div id="resLinks"></div>
+            </div>
+
+            <!-- Skills Section -->
+            <div class="full-width-box">
                 <h3>Detected Proficiencies</h3>
                 <div class="skills-container" id="resSkills"></div>
             </div>
@@ -304,7 +325,7 @@
     </div>
 
     <script>
-        // Drag and Drop Logic
+        // --- Drag and Drop UX Logic ---
         const dropZone = document.getElementById('dropZone');
 
         dropZone.addEventListener('dragover', (e) => {
@@ -339,6 +360,7 @@
             }
         }
 
+        // --- Core Processing Logic ---
         async function uploadAndParse() {
             const fileInput = document.getElementById('fileInput');
             const btn = document.getElementById('parseBtn');
@@ -346,40 +368,80 @@
             const loader = document.getElementById('loader');
             const resultsCard = document.getElementById('resultsCard');
 
+            // 1. Initial Selection Check
             if (fileInput.files.length === 0) {
                 alert("Please select a document first.");
                 return;
             }
 
-            // UI Loading State
+            const file = fileInput.files[0];
+
+            // 2. Client-Side Validation: File Type
+            if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith('.pdf')) {
+                alert("Invalid format. Please upload a PDF document.");
+                return;
+            }
+
+            // 3. Client-Side Validation: File Size (5MB limit)
+            const maxSizeInBytes = 5 * 1024 * 1024; 
+            if (file.size > maxSizeInBytes) {
+                alert("File is too large. Please upload a PDF under 5MB.");
+                return;
+            }
+
+            // --- UI Loading State ---
             btn.disabled = true;
             btnText.style.display = "none";
             loader.style.display = "block";
             resultsCard.style.display = "none";
-            
             resultsCard.style.animation = 'none';
-            resultsCard.offsetHeight; 
+            resultsCard.offsetHeight; // Trigger reflow
 
             const formData = new FormData();
-            formData.append("file", fileInput.files[0]);
+            formData.append("file", file);
 
             try {
+                // Send to Flask Backend
                 const response = await fetch('/upload', { method: 'POST', body: formData });
                 const data = await response.json();
 
                 if (response.ok) {
+                    // Populate Standard Contact Info
                     document.getElementById('resEmail').innerText = data.email || "Not found";
                     document.getElementById('resPhone').innerText = data.phone || "Not found";
                     
+                    // Populate AI Summary
+                    document.getElementById('resSummary').innerText = data.summary || "Summary generation inactive or failed.";
+
+                    // Populate Digital Footprint (Links)
+                    const linksContainerBox = document.getElementById('linksContainerBox');
+                    const linksDiv = document.getElementById('resLinks');
+                    linksDiv.innerHTML = ""; // Clear old data
+                    
+                    if (data.links && data.links.length > 0) {
+                        data.links.forEach(link => {
+                            const a = document.createElement('a');
+                            a.href = link;
+                            a.target = "_blank";
+                            a.className = "link-item";
+                            a.innerText = link.replace(/(^\w+:|^)\/\//, ''); // Strips http:// for cleaner look
+                            linksDiv.appendChild(a);
+                        });
+                        linksContainerBox.style.display = "block";
+                    } else {
+                        linksContainerBox.style.display = "none";
+                    }
+                    
+                    // Populate Skills
                     const skillsContainer = document.getElementById('resSkills');
-                    skillsContainer.innerHTML = "";
+                    skillsContainer.innerHTML = ""; // Clear old data
                     
                     if (data.skills && data.skills.length > 0) {
                         data.skills.forEach((skill, index) => {
                             const span = document.createElement('span');
                             span.className = 'skill-tag';
                             span.innerText = skill;
-                            span.style.animationDelay = `${index * 0.05}s`;
+                            span.style.animationDelay = `${index * 0.05}s`; // Staggered popIn effect
                             skillsContainer.appendChild(span);
                         });
                     } else {
@@ -387,14 +449,16 @@
                         skillsContainer.style.color = "var(--text-muted)";
                     }
 
+                    // Reveal Results Panel
                     resultsCard.style.display = "block";
                     resultsCard.style.animation = 'slideUp 0.5s ease forwards';
                 } else {
                     alert("System Error: " + data.error);
                 }
             } catch (error) {
-                alert("Connection to backend failed.");
+                alert("Connection to backend failed. Make sure your Flask server is running!");
             } finally {
+                // Reset Button UI
                 btn.disabled = false;
                 btnText.style.display = "block";
                 loader.style.display = "none";
