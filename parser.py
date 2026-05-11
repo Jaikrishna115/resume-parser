@@ -14,6 +14,7 @@ def generate_ai_summary(text):
     Calls OpenRouter API to generate a 2-sentence executive summary.
     """
     api_key = os.getenv("OPENROUTER_API_KEY")
+    print(f"\n--- DEBUG: First 15 chars of key --- \n{str(api_key)[:15]}...\n")
     
     if not api_key or api_key == "sk-or-v1-your-actual-api-key-goes-here":
         return "AI Summary unavailable: Missing or invalid OPENROUTER_API_KEY in .env file."
@@ -28,12 +29,24 @@ def generate_ai_summary(text):
                 "X-Title": "Executive Resume Parser"     # OpenRouter recommends passing your app name
             },
             json={
-                # You can change this to "openai/gpt-4o-mini" or "anthropic/claude-3-haiku" later
-                "model": "meta-llama/llama-3.2-1b-instruct",
+                "model": "meta-llama/llama-3.1-8b-instruct:free",
+                "temperature": 0.0, # Temperature 0 = No hallucinating/guessing
                 "messages": [
                     {
                         "role": "system", 
-                        "content": "You are an expert Executive Recruiter. Summarize the candidate's core qualifications, years of experience, and primary expertise in exactly 2 professional sentences based on the provided resume text. Do not use introductory phrases like 'Here is a summary'."
+                        "content": """You are a strict Data Extraction AI. 
+                        Read the resume text and extract the candidate's professional summary and technical skills.
+
+                        CRITICAL RULES:
+                        1. NEVER guess or invent years of experience. Only mention years of experience if it is explicitly stated in the resume. 
+                        2. If years of experience are not mentioned, simply provide a 2-sentence summary of the candidate's primary expertise and background based ONLY on what you understand from the text.
+                        3. Extract ONLY actual technical skills, programming languages, and frameworks. Do not extract timeframes, project names, or soft skills.
+
+                        Return your response STRICTLY as a JSON object without markdown formatting, formatted exactly like this:
+                        {
+                            "summary": "Exactly 2 professional sentences summarizing the resume.",
+                            "skills": ["Skill 1", "Skill 2", "Skill 3"]
+            }"""
                     },
                     {
                         "role": "user", 
@@ -91,7 +104,7 @@ def parse_resume(text):
         parsed_data["links"] = list(set(links))
         
     # Generate Executive Summary (Passing the first 2500 characters to keep API costs/latency low)
-    parsed_data["summary"] = generate_ai_summary(text[:2500])
+    parsed_data["summary"] = generate_ai_summary(text[:5000])
 
     # 4. Extract Skills using NLP token matching
     # A standard parser checks against a massive database of thousands of skills.

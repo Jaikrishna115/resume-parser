@@ -28,7 +28,7 @@ def upload_file():
         return jsonify({'error': 'No selected file'}), 400
         
     # 2. Process the PDF
-    if file and file.filename.endswith('.pdf'):
+    if file and file.filename.lower().endswith('.pdf'):
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
@@ -40,19 +40,23 @@ def upload_file():
             if raw_text.startswith("🚨"):
                 return jsonify({'error': 'Could not read PDF'}), 500
                 
-            # Step B: Run the NLP parser
+            # Step B: Run the AI parser
             parsed_data = parse_resume(raw_text)
             
             # Step C: Delete the temporary file
-            os.remove(filepath)
+            if os.path.exists(filepath):
+                os.remove(filepath)
             
             return jsonify(parsed_data)
             
         except Exception as e:
+            # Safety net: Ensure cleanup even if the AI parsing fails midway
+            if os.path.exists(filepath):
+                os.remove(filepath)
             return jsonify({'error': str(e)}), 500
             
     return jsonify({'error': 'Invalid file format. Please upload a PDF.'}), 400
 
 if __name__ == '__main__':
-    # We turn off the reloader here to prevent issues with the NLP model loading twice
-    app.run(debug=True, use_reloader=False)
+    # This means Flask will auto-update immediately whenever you save a file.
+    app.run(debug=True)
