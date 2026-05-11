@@ -1,4 +1,3 @@
-import spacy
 import os
 import requests
 import re
