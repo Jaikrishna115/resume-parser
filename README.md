@@ -4,7 +4,6 @@ An enterprise-grade, NLP-powered web application designed to automatically extra
 
 ## ✨ Intelligence Engine Features
 * **Automated Data Extraction:** Seamlessly parses PDF documents utilizing `PyMuPDF` for rapid, secure raw text extraction.
-* **Exhaustive Proficiency Matching:** Powered by `spaCy` tokenization, the engine evaluates candidate text against a massive "Mega-Dictionary" of modern tech stacks to guarantee high-precision skill extraction without AI hallucination.
 * **Regex Architecture:** Utilizes advanced regular expressions to accurately isolate phone numbers and email addresses, accounting for regional formatting variances.
 * **Premium UI/UX:** Features a glassmorphism dark-mode interface with asynchronous processing, golden accents, drag-and-drop capabilities, and micro-interaction animations.
 
